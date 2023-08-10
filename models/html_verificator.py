@@ -52,7 +52,7 @@ for example, label in train_dataset.take(1):
 
 """Create the text encoder"""
 
-VOCAB_SIZE = 1000
+VOCAB_SIZE = 5000
 encoder = tf.keras.layers.TextVectorization(
     max_tokens=VOCAB_SIZE)
 encoder.adapt(train_dataset.map(lambda text, label: text))
@@ -131,8 +131,3 @@ new_model = tf.keras.models.load_model("phishing")
 
 predictions = new_model.predict(text_text)
 print(predictions)
-
-test_loss, test_acc = new_model.evaluate(test_dataset)
-
-print('Test Loss:', test_loss)
-print('Test Accuracy:', test_acc)
