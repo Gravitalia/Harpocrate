@@ -16,12 +16,14 @@ service Harpocrate {
 
 // Enumerate every possible options
 enum Option {
-    // Disable analytics and url analysis
-    DISABLE_BOTH = 0;
+    // Unspecified enum value have no effect on desactivation
+    OPTION_UNSPECIFIED = 0;
     // Do not count each click (may result in faster redirection).
     DISABLE_ANALYTICS = 1;
     // Do not check whether the link is a phising website (may result in faster savings).
     DISABLE_ANALYSIS = 2;
+    // Disable analytics and url analysis
+    DISABLE_BOTH = 3;
 }
 
 // Request message containing url and option
