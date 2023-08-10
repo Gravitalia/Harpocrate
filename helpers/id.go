@@ -7,9 +7,9 @@ import (
 	"math/big"
 )
 
+// assertAvailablePRNG checks if a cryptographically secure PRNG is available.
+// Panic otherwise.
 func assertAvailablePRNG() {
-	// Assert that a cryptographically secure PRNG is available.
-	// Panic otherwise.
 	buf := make([]byte, 1)
 
 	_, err := io.ReadFull(rand.Reader, buf)
