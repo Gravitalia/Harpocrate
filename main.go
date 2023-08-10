@@ -6,6 +6,7 @@ import (
 	"net"
 	"os"
 
+	"github.com/Gravitalia/Harpocrate/database"
 	"github.com/Gravitalia/Harpocrate/proto"
 	"google.golang.org/grpc"
 )
@@ -26,6 +27,18 @@ func (s *server) Upload(
 }
 
 func main() {
+	// Init database session
+	if err := database.CreateSession(); err != nil {
+		// Exit with code 1, and print error message
+		// if session not initizalied
+		log.Fatalf(
+			"Cannot create new Cassandra session: %v",
+			err,
+		)
+	}
+	// Create database tables if not exists
+	database.CreateTables()
+
 	// Get port from environnement
 	port := os.Getenv("PORT")
 	if port == "" {
