@@ -11,14 +11,14 @@ import (
 const (
 	HOST     string = "CASSANDRA_HOST"
 	USERNAME string = "CASSANDRA_USERNAME"
-	PASSWORD string = "CASSANDRA_PASSWOWRD"
+	PASSWORD string = "CASSANDRA_PASSWORD"
 )
 
 var Session *gocql.Session
 
 // CreateSession returns an error. It allows to create a new session with basic authentification data (username and password) and then, set it to global variable Session.
 func CreateSession() error {
-	// Get adress from environnement
+	// Get address from environnement
 	address := os.Getenv(HOST)
 	if address == "" {
 		// Log that no host/address has been provided
@@ -51,13 +51,14 @@ func CreateSession() error {
 		password = "cassandra"
 	}
 
-	// Add authentification parameters (if not defined, set cassandra as username, and cassandra as password)
+	// Add authentification parameters (if not defined,
+	// set cassandra as username, and cassandra as password)
 	cluster.Authenticator = gocql.PasswordAuthenticator{
 		Username: username,
 		Password: password,
 	}
 
-	// Create session. If session do not works, exit
+	// Create session. If session do not works, exit and close server
 	if connection, err := cluster.CreateSession(); err != nil {
 		log.Fatalf(
 			"(CreateSession) Cannot create new Cassandra session: %v",
@@ -71,7 +72,8 @@ func CreateSession() error {
 	return nil
 }
 
-// CreateTables allows to create tables of the keyspace. It returns nothing, but performs optimized action.
+// CreateTables allows to create tables of the keyspace.
+// It returns nothing, but performs optimized action.
 func CreateTables() {
 	if err := Session.Query("CREATE TABLE IF NOT EXISTS harpocrate.users ( id TEXT, original_url TEXT, author TEXT, analytics BOOLEAN, PRIMARY KEY (id) ) WITH  compression = {'sstable_compression': 'LZ4Compressor'};").Exec(); err != nil {
 		log.Printf(
