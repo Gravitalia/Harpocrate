@@ -27,32 +27,28 @@ func (s *server) Upload(
 }
 
 func main() {
-	// Init database session
+	// Init database session, if session not initizalied,
+	// Exit with code 1, and print error message
 	if err := database.CreateSession(); err != nil {
-		// Exit with code 1, and print error message
-		// if session not initizalied
 		log.Fatalf(
 			"Cannot create new Cassandra session: %v",
 			err,
 		)
 	}
-	// Create database tables if not exists
+
 	database.CreateTables()
 
-	// Get port from environnement
+	// Get port from environnement, if no one is set, take 5000
 	port := os.Getenv("PORT")
 	if port == "" {
-		// If port is not in environnement, set it to 5000
 		port = "5000"
 	}
 
-	// Create listener
 	lis, err := net.Listen("tcp", ":"+port)
 	if err != nil {
 		log.Fatalf("failed to listen: %v", err)
 	}
 
-	// Log used port in console
 	log.Printf("Listening on port: %s\n", port)
 
 	// Set maximum message size
@@ -67,7 +63,5 @@ func main() {
 	// Create gRPC server
 	grpcServer := grpc.NewServer(opts...)
 	proto.RegisterHarpocrateServer(grpcServer, &server{})
-
-	// Listen gRPC requests
 	grpcServer.Serve(lis)
 }
