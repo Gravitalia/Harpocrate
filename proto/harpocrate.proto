@@ -11,7 +11,7 @@ option java_outer_classname = "HarpocrateProto";
 // The shortener service creation that allows to reduce URL length
 service Harpocrate {
     // Reduce link length by according a random ID to a link
-    rpc Reduce (ReduceRequest) returns (ReduceReponse) {}
+    rpc Reduce (ReduceRequest) returns (ReduceReponse);
 }
 
 // Enumerate every possible options
