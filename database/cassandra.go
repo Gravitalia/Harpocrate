@@ -16,20 +16,18 @@ const (
 
 var Session *gocql.Session
 
-// CreateSession returns an error. It allows to create a new session with basic authentification data (username and password) and then, set it to global variable Session.
+// CreateSession allows to create a new session with basicauthentification data (username and password)
+// and then, set it to global variable Session. It returns an error in case of mis-connection.
 func CreateSession() error {
-	// Get address from environnement
 	address := os.Getenv(HOST)
 	if address == "" {
-		// Log that no host/address has been provided
+		// Set basic address if no one is given and log it
 		log.Println(
 			"No CASSANDRA_HOST environment variable found. Using default address: 127.0.0.1",
 		)
-		// Set basic address if no one is given
 		address = "127.0.0.1"
 	}
 
-	// Create new cluster with custom address
 	cluster := gocql.NewCluster(address)
 
 	// Set cluster consistency as LocalOne, the most economic one
@@ -37,7 +35,6 @@ func CreateSession() error {
 
 	// Set cassandra username
 	var username string
-	// Get username from environnement
 	if username = os.Getenv(USERNAME); username == "" {
 		// If no username is provided, set it as default
 		username = "cassandra"
@@ -45,7 +42,6 @@ func CreateSession() error {
 
 	// Set cassandra password
 	var password string
-	// Get password from environnement
 	if password = os.Getenv(PASSWORD); password == "" {
 		// If no password is provided, set it as default
 		password = "cassandra"
