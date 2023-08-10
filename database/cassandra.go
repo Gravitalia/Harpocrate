@@ -60,10 +60,6 @@ func CreateSession() error {
 
 	// Create session. If session do not works, exit and close server
 	if connection, err := cluster.CreateSession(); err != nil {
-		log.Fatalf(
-			"(CreateSession) Cannot create new Cassandra session: %v",
-			err,
-		)
 		return err
 	} else {
 		Session = connection
@@ -75,9 +71,13 @@ func CreateSession() error {
 // CreateTables allows to create tables of the keyspace.
 // It returns nothing, but performs optimized action.
 func CreateTables() {
-	if err := Session.Query("CREATE TABLE IF NOT EXISTS harpocrate.users ( id TEXT, original_url TEXT, author TEXT, analytics BOOLEAN, PRIMARY KEY (id) ) WITH  compression = {'sstable_compression': 'LZ4Compressor'};").Exec(); err != nil {
+	// Create url table with id (random string), original_url,
+	// author (user vanity), whether or not analysis is enabled.
+	if err := Session.Query("CREATE TABLE IF NOT EXISTS harpocrate.url ( id TEXT, original_url TEXT, author TEXT, analytics BOOLEAN, PRIMARY KEY (id) ) WITH  compression = {'sstable_compression': 'LZ4Compressor'};").Exec(); err != nil {
+		// If table haven't been created (got an error while creating it)
+		// log error, and warn user
 		log.Printf(
-			"(CreateTables) Create table harpocrate.users got error: %v",
+			"(CreateTables) Create table harpocrate.url got error: %v",
 			err,
 		)
 	}
