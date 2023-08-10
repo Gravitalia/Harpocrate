@@ -26,8 +26,12 @@ enum Option {
 
 // Request message containing url and option
 message ReduceRequest {
+    // URL to reduce
     string url = 1;
-    optional Option opt = 2;
+    // Author who entered the URL
+    string author = 2;
+    // Optional state to disable custom analysis
+    optional Option opt = 3;
 }
 
 // Response message containing ID to get a custom short link
