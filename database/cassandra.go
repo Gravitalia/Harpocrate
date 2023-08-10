@@ -66,7 +66,7 @@ func CreateSession() error {
 // CreateTables allows to create tables of the keyspace.
 // It returns nothing, but performs optimized action.
 func CreateTables() {
-	if err := Session.Query("CREATE TABLE IF NOT EXISTS harpocrate.url ( id TEXT, original_url TEXT, author TEXT, analytics BOOLEAN, PRIMARY KEY (id) ) WITH  compression = {'sstable_compression': 'LZ4Compressor'};").Exec(); err != nil {
+	if err := Session.Query("CREATE TABLE IF NOT EXISTS harpocrate.url ( id TEXT, original_url TEXT, author TEXT, analytics BOOLEAN, phishing FLOAT, PRIMARY KEY (id) ) WITH compression = {'sstable_compression': 'LZ4Compressor'};").Exec(); err != nil {
 		log.Printf(
 			"(CreateTables) Create table harpocrate.url got error: %v",
 			err,
