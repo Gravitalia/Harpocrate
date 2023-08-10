@@ -1,0 +1,36 @@
+syntax = "proto3";
+
+package gravitalia.harpocrate.v1;
+
+option csharp_namespace = "Gravitalia.Harpocrate.V1";
+option go_package = "github.com/gravitalia/harpocrate/proto";
+option java_package = "com.gravitalia.harpocrate.v1";
+option java_multiple_files = true;
+option java_outer_classname = "HarpocrateProto";
+
+// The shortener service creation that allows to reduce URL length
+service Harpocrate {
+    // Reduce link length by according a random ID to a link
+    rpc Reduce (ReduceRequest) returns (ReduceReponse) {}
+}
+
+// Enumerate every possible options
+enum Option {
+    // Disable analytics and url analysis
+    DISABLE_BOTH = 0;
+    // Do not count each click (may result in faster redirection).
+    DISABLE_ANALYTICS = 1;
+    // Do not check whether the link is a phising website (may result in faster savings).
+    DISABLE_ANALYSIS = 2;
+}
+
+// Request message containing url and option
+message ReduceRequest {
+    string url = 1;
+    optional Option opt = 2;
+}
+
+// Response message containing ID to get a custom short link
+message ReduceReponse {
+    string id = 1;
+}
