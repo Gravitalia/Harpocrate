@@ -14,6 +14,7 @@ const (
 	PASSWORD string = "CASSANDRA_PASSWORD"
 )
 
+// Session represents Cassandra active connection
 var Session *gocql.Session
 
 // CreateSession allows to create a new session with basicauthentification data (username and password)
