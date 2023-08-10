@@ -30,25 +30,24 @@ func CreateSession() error {
 
 	cluster := gocql.NewCluster(address)
 
-	// Set cluster consistency as LocalOne, the most economic one
+	// Set cluster consistency as LocalOne,
+	// the most economic one because it only needs to be
+	// accepted by one replica node in the local datacenter
 	cluster.Consistency = gocql.LocalOne
 
-	// Set cassandra username
+	// Obtains Cassandra credentials from environment variables.
+	// In case they are absent, we use `cassandra` as both login and password.
 	var username string
 	if username = os.Getenv(USERNAME); username == "" {
-		// If no username is provided, set it as default
 		username = "cassandra"
 	}
 
-	// Set cassandra password
 	var password string
 	if password = os.Getenv(PASSWORD); password == "" {
-		// If no password is provided, set it as default
 		password = "cassandra"
 	}
 
-	// Add authentification parameters (if not defined,
-	// set cassandra as username, and cassandra as password)
+	// Add authentification parameters
 	cluster.Authenticator = gocql.PasswordAuthenticator{
 		Username: username,
 		Password: password,
@@ -67,11 +66,7 @@ func CreateSession() error {
 // CreateTables allows to create tables of the keyspace.
 // It returns nothing, but performs optimized action.
 func CreateTables() {
-	// Create url table with id (random string), original_url,
-	// author (user vanity), whether or not analysis is enabled.
 	if err := Session.Query("CREATE TABLE IF NOT EXISTS harpocrate.url ( id TEXT, original_url TEXT, author TEXT, analytics BOOLEAN, PRIMARY KEY (id) ) WITH  compression = {'sstable_compression': 'LZ4Compressor'};").Exec(); err != nil {
-		// If table haven't been created (got an error while creating it)
-		// log error, and warn user
 		log.Printf(
 			"(CreateTables) Create table harpocrate.url got error: %v",
 			err,
