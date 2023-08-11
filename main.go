@@ -5,8 +5,11 @@ import (
 	"fmt"
 	"log"
 	"net"
+	"net/http"
 	"os"
 	"regexp"
+	"strings"
+	"text/template"
 
 	"github.com/Gravitalia/Harpocrate/database"
 	"github.com/Gravitalia/Harpocrate/helpers"
@@ -20,12 +23,13 @@ type server struct {
 	proto.UnimplementedHarpocrateServer
 }
 
-// Upload defines route to reduce URL size, checks
-func (s *server) Upload(
+// Reduce defines route to reduce URL size, checks
+func (s *server) Reduce(
 	ctx context.Context,
 	in *proto.ReduceRequest,
 ) (*proto.ReduceReponse, error) {
 	id, err := helpers.GenerateRandomString(8)
+	fmt.Println(id)
 	if err != nil {
 		log.Printf("Cannot create random string: %v", err)
 
@@ -42,7 +46,7 @@ func (s *server) Upload(
 	}
 
 	// Get HTML content, and check if page exists
-	_, err = helpers.GetPageHTML(in.Url)
+	content, err := helpers.GetPageHTML(in.Url)
 	if err != nil {
 		return &proto.ReduceReponse{
 			Id: "",
@@ -51,13 +55,7 @@ func (s *server) Upload(
 
 	database.Session.Query(
 		"INSERT INTO harpocrate.url ( id, original_url, author, analytics, phishing ) VALUES (?, ?, ?, ?, ?);",
-		model.URL{
-			Id:          id,
-			OriginalUrl: in.Url,
-			Author:      "",
-			Analytics:   in.Opt.Number() == 1 || in.Opt.Number() == 3,
-			Phishing:    -1.456,
-		},
+		id, in.Url, "", in.Opt.Number() == 1 || in.Opt.Number() == 3, helpers.CheckHTML(content),
 	)
 
 	return &proto.ReduceReponse{
@@ -65,18 +63,33 @@ func (s *server) Upload(
 	}, nil
 }
 
+// generateHTMLPage parse templating file and then, return an html
+// containing URL
+func generateHTMLPage(w http.ResponseWriter, tmplFile string, data interface{}) {
+	tmpl, err := template.ParseFiles(tmplFile)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+
+	err = tmpl.Execute(w, data)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+}
+
 func main() {
-	fmt.Println(helpers.GenerateRandomString(8))
 	// Init database session, if session not initizalied,
 	// Exit with code 1, and print error message
-	if err := database.CreateSession(); err != nil {
+	/*if err := database.CreateSession(); err != nil {
 		log.Fatalf(
 			"Cannot create new Cassandra session: %v",
 			err,
 		)
-	}
+	}*/
 
-	database.CreateTables()
+	//database.CreateTables()
 
 	// Get port from environnement, if no one is set, take 5000
 	port := os.Getenv("PORT")
@@ -99,6 +112,34 @@ func main() {
 		grpc.MaxRecvMsgSize(maxMsgSize),
 		grpc.MaxSendMsgSize(maxMsgSize),
 	)
+
+	// Create multiplexer
+	httpMux := http.NewServeMux()
+
+	go func() {
+		if err := http.Serve(lis, httpMux); err != nil {
+			log.Fatalf("HTTP server failed: %v", err)
+		}
+	}()
+
+	httpMux.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
+		id := strings.TrimPrefix(r.URL.Path, "/")
+		if id == "" {
+			return
+		}
+
+		var data model.Basics
+		database.Session.Query(
+			"SELECT original_url, phishing FROM harpocrate.url WHERE id = ?;",
+			id,
+		).Scan(&data.OriginalUrl, &data.Phishing)
+
+		if data.Phishing > 0.5 {
+			http.Redirect(w, r, data.OriginalUrl, http.StatusPermanentRedirect)
+		} else {
+			generateHTMLPage(w, "template.html", data)
+		}
+	})
 
 	// Create gRPC server
 	grpcServer := grpc.NewServer(opts...)
