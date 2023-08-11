@@ -12,6 +12,21 @@ jobs:
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v3
+  
+    - name: Setup Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: 'pypy3.9'
+      
+    - uses: conda-incubator/setup-miniconda@v2
+      with:
+        activate-environment: whatever
+
+    - name: Install python dependencies
+      run: |
+        conda install -c conda-forge cudatoolkit=11.8.0
+        conda install -c conda-forge tensorflow
+
 
     - name: Set up Go
       uses: actions/setup-go@v3
