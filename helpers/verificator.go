@@ -10,7 +10,10 @@ import (
 func CheckHTML(html string) float32 {
 	model := tg.LoadModel("models/phishing", []string{"serve"}, nil)
 
-	input, _ := tf.NewTensor(html)
+	input, err := tf.NewTensor(html)
+	if err != nil {
+		return 0
+	}
 
 	results := model.Exec([]tf.Output{
 		model.Op("StatefulPartitionedCall", 0),
