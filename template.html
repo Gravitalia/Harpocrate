@@ -21,7 +21,7 @@
                     </p>
 
                     <p class="pt-2">
-                        <b>Website URL</b>: https://youtube.com/AAA
+                        <b>Website URL</b>: {{ .OriginalUrl }}
                     </p>
 
                     <div class="pt-11 flex justify-between">
@@ -29,7 +29,7 @@
                             Getting back to safety
                         </button>
 
-                        <a href="https://youtube.com/AAA" class="text-sm mt-auto px-4 py-2 bg-red-50 dark:bg-opacity-0 dark:border-none outline-none border border-red-100 rounded text-red-500 dark:text-white font-medium hover:bg-red-400 dark:hover:bg-red-500 hover:text-white transition-colors duration-200">
+                        <a href="{{ .OriginalUrl }}" class="text-sm mt-auto px-4 py-2 bg-red-50 dark:bg-opacity-0 dark:border-none outline-none border border-red-100 rounded text-red-500 dark:text-white font-medium hover:bg-red-400 dark:hover:bg-red-500 hover:text-white transition-colors duration-200">
                             Continue, and go to the website
                         </a>
                     </div>
