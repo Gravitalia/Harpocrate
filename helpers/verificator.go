@@ -1,14 +1,9 @@
 package helpers
 
-import (
-	tf "github.com/galeone/tensorflow/tensorflow/go"
-	tg "github.com/galeone/tfgo"
-)
-
 // CheckHTML uses machine learning to detect fake
 // websites such as pishing ones
 func CheckHTML(html string) float32 {
-	model := tg.LoadModel("models/phishing", []string{"serve"}, nil)
+	/*model := tg.LoadModel("models/phishing", []string{"serve"}, nil)
 
 	input, err := tf.NewTensor(html)
 	if err != nil {
@@ -21,5 +16,6 @@ func CheckHTML(html string) float32 {
 		model.Op("serving_default_inputs_input", 0): input,
 	})
 
-	return results[0].Value().(float32)
+	return results[0].Value().(float32)*/
+	return 0
 }
