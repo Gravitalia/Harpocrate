@@ -82,14 +82,14 @@ func generateHTMLPage(w http.ResponseWriter, tmplFile string, data interface{}) 
 func main() {
 	// Init database session, if session not initizalied,
 	// Exit with code 1, and print error message
-	/*if err := database.CreateSession(); err != nil {
+	if err := database.CreateSession(); err != nil {
 		log.Fatalf(
 			"Cannot create new Cassandra session: %v",
 			err,
 		)
-	}*/
+	}
 
-	//database.CreateTables()
+	database.CreateTables()
 
 	// Get port from environnement, if no one is set, take 5000
 	port := os.Getenv("PORT")
